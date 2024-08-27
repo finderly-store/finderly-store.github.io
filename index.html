@@ -56,19 +56,21 @@
     .button.apple {
       background: #A3AAAE;
       color: #FFF;
+      text-align: center;
     }
     .button.apple:hover {
       background: #8A9297;
     }
-    .button.play-store {
-      background: #34A853;
-      color: #FFF;
-    }
-    .button.play-store:hover {
-      background: #2C8C4A;
-    }
-    .button img {
+    .button img.apple-icon {
       margin-right: 0.5rem;
+    }
+    .button.play-store {
+      background: none;
+      color: #FFF;
+      text-align: center;
+    }
+    .button img.play-store-icon {
+      max-width: 100%;
     }
     .support {
       margin-top: 2rem;
@@ -122,12 +124,11 @@
   <!-- Buttons -->
   <div class="buttons">
     <div class="button apple" onclick="window.open('https://testflight.apple.com/join/urA4pbaW', '_blank')">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple logo" width="24" height="24">
+      <img class="apple-icon" src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple logo" width="24" height="24">
       Download on App Store
     </div>
     <div class="button play-store" onclick="togglePlayStoreInfo()">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Play Store logo" width="24" height="24">
-      Get it on Play Store
+      <img class="play-store-icon" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Play Store logo">
     </div>
   </div>
 
