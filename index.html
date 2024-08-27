@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finderly</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #FFF;
+      color: #333;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    .banner {
+      background: #7E22CE;
+      color: #FFF;
+      padding: 1rem;
+      text-align: center;
+      width: 100%;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .img img{
+      width: 100%;
+      max-width: 250px;
+      margin-bottom: 1rem;
+      border-radius: 25%;
+    }
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 2rem;
+      width: 100%;
+      max-width: 320px;
+      align-items: center;
+    }
+    .button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+      width: 100%;
+    }
+    .button.apple {
+      background: #A3AAAE;
+      color: #FFF;
+    }
+    .button.apple:hover {
+      background: #8A9297;
+    }
+    .button.play-store {
+      background: #34A853;
+      color: #FFF;
+    }
+    .button.play-store:hover {
+      background: #2C8C4A;
+    }
+    .button img {
+      margin-right: 0.5rem;
+    }
+    .support {
+      margin-top: 2rem;
+      font-size: 1rem;
+      color: #7E22CE;
+      text-align: center;
+      width: 100%;
+    }
+    .play-store-info {
+      display: none;
+      padding: 1rem;
+      border: 1px solid #34A853;
+      border-radius: 4px;
+      margin-top: 1rem;
+      background-color: #F9F9F9;
+      text-align: center;
+      width: 100%;
+      max-width: 320px;
+    }
+    .play-store-info.visible {
+      display: block;
+    }
+    .play-store-info a {
+      color: #7E22CE;
+      text-decoration: none;
+    }
+    .play-store-info button {
+      background: #7E22CE;
+      color: #FFF;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 1rem;
+    }
+    .play-store-info button:hover {
+      background: #6D1AAF;
+    }
+  </style>
+</head>
+<body>
+  <!-- Logo -->
+  <div class="img">
+    <img src="https://search.kxci.us/logo.png" alt="Finderly Logo">
+  </div>
+  <div class="banner">
+    <h1>Finderly</h1>
+  </div>
+
+  <!-- Buttons -->
+  <div class="buttons">
+    <div class="button apple" onclick="window.open('https://testflight.apple.com/join/urA4pbaW', '_blank')">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple logo" width="24" height="24">
+      Download on App Store
+    </div>
+    <div class="button play-store" onclick="togglePlayStoreInfo()">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Play Store logo" width="24" height="24">
+      Get it on Play Store
+    </div>
+  </div>
+
+  <!-- Play Store Info -->
+  <div class="play-store-info" id="playStoreInfo">
+    <h2>Steps to Install on Play Store</h2>
+    <p>Step 1: With your Play Store email, first join 'testers-community' Google Groups via this link: <a href="https://groups.google.com/g/testers-community/" target="_blank">Join Testers Group</a></p>
+    <p>Step 2: Install the app from Play Store via this link <a href="https://play.google.com/store/apps/details?id=store.finderly" target="_blank">Install Finderly</a></p>
+    <button onclick="togglePlayStoreInfo()">Close</button>
+  </div>
+
+  <!-- Support -->
+  <div class="support">
+    <p>For support and suggestions, contact us at: <a href="mailto:support@finderly.store">support@finderly.store</a></p>
+  </div>
+
+  <script>
+    function togglePlayStoreInfo() {
+      var infoDiv = document.getElementById('playStoreInfo');
+      if (infoDiv.classList.contains('visible')) {
+        infoDiv.classList.remove('visible');
+      } else {
+        infoDiv.classList.add('visible');
+      }
+    }
+  </script>
+
+</body>
+</html>
