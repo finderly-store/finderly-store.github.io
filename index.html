@@ -138,7 +138,7 @@
     "@type": "WebSite",
     "name": "Finderly",
     "url": "https://finderly.store",
-    "description": "Find what you’re looking for with just an image.",
+    "description": "Find what you are looking for with just an image.",
     "publisher": {
         "@type": "Organization",
         "name": "Finderly",
@@ -150,7 +150,10 @@
     "image": {
         "@type": "ImageObject",
         "url": "https://finderly.store/logo.png"
-    }
+    },
+    "sameAs": [
+        "https://play.google.com/store/apps/details?id=store.finderly"
+    ]
   }
   </script>
 </head>
@@ -169,10 +172,10 @@
   <!-- Buttons -->
   <div class="buttons">
     <div class="button apple" onclick="window.open('https://testflight.apple.com/join/urA4pbaW', '_blank')">
-      <img class="apple-icon" src="./Download_on_the_App_Store_Badge.svg" alt="Apple logo">
+      <img class="apple-icon" src="./Download_on_the_App_Store_Badge.svg" alt="Download on the App Store logo">
     </div>
     <div class="button play-store" onclick="window.open('https://play.google.com/store/apps/details?id=store.finderly', '_blank')">
-      <img class="play-store-icon" src="./Google_Play_Store_badge_EN.svg" alt="Play Store logo">
+      <img class="play-store-icon" src="./Google_Play_Store_badge_EN.svg" alt="Get on Google Play Store logo">
     </div>
   </div>
 
@@ -182,15 +185,5 @@
     <p>For support and suggestions, contact us at: <a href="mailto:support@finderly.store">support@finderly.store</a></p>
   </div>
 
-  <script>
-    function togglePlayStoreInfo() {
-      var infoDiv = document.getElementById('playStoreInfo');
-      if (infoDiv.classList.contains('visible')) {
-        infoDiv.classList.remove('visible');
-      } else {
-        infoDiv.classList.add('visible');
-      }
-    }
-  </script>
 </body>
 </html>
