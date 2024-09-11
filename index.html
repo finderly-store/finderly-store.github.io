@@ -81,19 +81,16 @@
     }
 
     .button.apple {
-      background: #A3AAAE;
       color: #FFF;
       text-align: center;
-      margin-top: 2rem;
-
+      margin-top: 1rem;
     }
 
-    .button.apple:hover {
-      background: #8A9297;
-    }
 
     .button img.apple-icon {
       margin-right: 0.5rem;
+      width: 75%;
+
     }
 
     .button.play-store {
@@ -104,6 +101,8 @@
 
     .button img.play-store-icon {
       margin-right: 0.5rem;
+      width: 75%;
+
     }
 
     .support {
@@ -113,42 +112,6 @@
       text-align: center;
     }
 
-    .play-store-info {
-      display: none;
-      padding: 1rem;
-      border: 1px solid #34A853;
-      border-radius: 8px;
-      margin-top: 1rem;
-      background-color: #FFF;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      width: 100%;
-      max-width: 320px;
-    }
-
-    .play-store-info.visible {
-      display: block;
-    }
-
-    .play-store-info a {
-      color: #7E22CE;
-      text-decoration: underline;
-    }
-
-    .play-store-info button {
-      background: #7E22CE;
-      color: #FFF;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s ease-in-out;
-      margin-top: 1rem;
-    }
-
-    .play-store-info button:hover {
-      background: #6D1AAF;
-    }
 
     @media (min-width: 600px) {
       .banner {
@@ -206,21 +169,13 @@
   <!-- Buttons -->
   <div class="buttons">
     <div class="button apple" onclick="window.open('https://testflight.apple.com/join/urA4pbaW', '_blank')">
-      <img class="apple-icon" src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple logo" width="24" height="24">
-      Download on App Store
+      <img class="apple-icon" src="./Download_on_the_App_Store_Badge.svg" alt="Apple logo">
     </div>
-    <div class="button play-store" onclick="togglePlayStoreInfo()">
-      <img class="play-store-icon" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Play Store logo">
+    <div class="button play-store" onclick="window.open('https://play.google.com/store/apps/details?id=store.finderly', '_blank')">
+      <img class="play-store-icon" src="./Google_Play_Store_badge_EN.svg" alt="Play Store logo">
     </div>
   </div>
 
-  <!-- Play Store Info -->
-  <div class="play-store-info" id="playStoreInfo">
-    <h2>Steps to Install on Play Store</h2>
-    <p>Step 1: With your Play Store email, first join 'testers-community' Google Groups via this link: <a href="https://groups.google.com/g/testers-community/" target="_blank">Join Testers Group</a></p>
-    <p>Step 2: Install the app from Play Store via this link <a href="https://play.google.com/store/apps/details?id=store.finderly" target="_blank">Install Finderly</a></p>
-    <button onclick="togglePlayStoreInfo()">Close</button>
-  </div>
 
   <!-- Support -->
   <div class="support">
