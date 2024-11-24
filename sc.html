@@ -211,7 +211,7 @@
 
       return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 space-y-6 p-4">
-          <h1 className="text-2xl font-bold">Snap to Quote</h1>
+          <h1 className="text-4xl font-bold">Snap to Quote</h1>
           {error && (
             <div className="text-red-500">
               {error}
@@ -222,14 +222,14 @@
             <>
               <button
                 onClick={handleTakeLivePhoto}
-                className="px-4 py-2 bg-blue-500 text-white rounded shadow"
+                className="text-2xl px-4 py-2 bg-blue-500 text-white rounded shadow"
               >
                 Take a Live Photo
               </button>
 
               <label
                 htmlFor="fileInput"
-                className="px-4 py-2 bg-green-500 text-white rounded shadow cursor-pointer"
+                className="text-2xl px-4 py-2 bg-green-500 text-white rounded shadow cursor-pointer"
               >
                 Choose from Gallery
               </label>
@@ -250,13 +250,13 @@
               </div>
               <button
                 onClick={handleCapturePhoto}
-                className="px-4 py-2 bg-blue-500 text-white rounded shadow"
+                className="text-2xl px-4 py-2 bg-blue-500 text-white rounded shadow"
               >
                 Take a Photo
               </button>
               <button
                 onClick={() => { setShowCameraPreview(false); }}
-                className="px-4 py-2 bg-gray-500 text-white rounded shadow"
+                className="text-2xl px-4 py-2 bg-gray-500 text-white rounded shadow"
               >
                 Cancel
               </button>
