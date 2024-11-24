@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Snap to Quote</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React and ReactDOM CDN -->
+  <!-- <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script> -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+
+  <!-- Babel CDN for JSX transpilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <!-- Root element for React -->
+  <div id="root"></div>
+
+  <!-- React code -->
+  <script type="text/babel">
+    // Custom fetchWithTimeout function
+    const fetchWithTimeout = (url, options, timeout = 20000) => {
+      return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), timeout)
+        ),
+      ]);
+    };
+
+    const App = () => {
+      const [imageSrc, setImageSrc] = React.useState(null);
+      const [loading, setLoading] = React.useState(false);
+      const [loadingResults, setLoadingResults] = React.useState(false);
+      const [problems, setProblems] = React.useState([]);
+      const [error, setError] = React.useState(null);
+
+      // Handle capturing photo via camera
+      const handleCapturePhoto = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          const videoTracks = stream.getVideoTracks();
+          const track = videoTracks[0];
+
+          // Create a video element to capture the image
+          const video = document.createElement('video');
+          video.srcObject = stream;
+          await video.play();
+
+          // Create a canvas to draw the frame
+          const canvas = document.createElement('canvas');
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          const context = canvas.getContext('2d');
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          // Stop the video stream
+          track.stop();
+
+          const dataUrl = canvas.toDataURL('image/jpeg');
+          uploadImage(dataUrl);
+        } catch (error) {
+          console.error('Error accessing camera:', error);
+          alert('Unable to access camera.');
+        }
+      };
+
+      // Handle selecting photo from gallery
+      const handleSelectPhoto = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const dataUrl = reader.result;
+            uploadImage(dataUrl);
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      // Upload image to the server
+      const uploadImage = async (dataUrl) => {
+        try {
+          setLoading(true);
+          const response = await fetchWithTimeout(
+            'https://s.finderly.store/SC-image/',
+            {
+              method: 'POST',
+              body: JSON.stringify({ image: dataUrl }),
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            },
+            20000
+          );
+          const text = await response.text();
+          const data = JSON.parse(text);
+
+          if (!data || !data.image_uuid) {
+            throw new Error('Image upload response does not contain image_uuid');
+          }
+
+          const imageUrl = `https://pictureblobstorage.blob.core.windows.net/picture/${data.image_uuid}`;
+          setImageSrc(imageUrl);
+
+          // After uploading the image, get the detailed response
+          getDetailedResponse(data.image_uuid);
+        } catch (error) {
+          console.error('Error uploading image:', error);
+          alert('Failed to upload image.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      // Get detailed response from SC-service
+      const getDetailedResponse = async (image_uuid) => {
+        try {
+            setLoadingResults(true);
+            const response = await fetchWithTimeout(
+            'https://s.finderly.store/SC-service',
+            {
+                method: 'POST',
+                body: JSON.stringify({ image_uuid }),
+                headers: {
+                'Content-Type': 'application/json',
+                },
+            },
+            20000
+            );
+
+            // Check if response is OK
+            if (!response.ok) {
+            throw new Error(`Server responded with status ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            console.log('Raw data:', data);
+
+            let parsedData;
+
+            if (data.body) {
+            parsedData = JSON.parse(data.body);
+            } else {
+            parsedData = data;
+            }
+
+            console.log('Parsed data:', parsedData);
+
+            if (!parsedData || !Array.isArray(parsedData.problems)) {
+            throw new Error('Response does not contain a valid problems array');
+            }
+
+            setProblems(parsedData.problems);
+        } catch (error) {
+            console.error('Error fetching detailed response:', error);
+            setError('An error occurred while processing data: ' + error.message);
+        } finally {
+            setLoadingResults(false);
+        }
+        };
+
+
+      // Reset the application state
+      const handleReset = () => {
+        setImageSrc(null);
+        setProblems([]);
+        setError(null);
+      };
+
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 space-y-6 p-4">
+          <h1 className="text-2xl font-bold">Snap to Quote</h1>
+          {error && (
+            <div className="text-red-500">
+              {error}
+            </div>
+          )}
+          {!imageSrc && !loading && (
+            <>
+              <button
+                onClick={handleCapturePhoto}
+                className="px-4 py-2 bg-blue-500 text-white rounded shadow"
+              >
+                Take a Photo
+              </button>
+
+              <label
+                htmlFor="fileInput"
+                className="px-4 py-2 bg-green-500 text-white rounded shadow cursor-pointer"
+              >
+                Choose from Gallery
+              </label>
+              <input
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                onChange={handleSelectPhoto}
+                className="hidden"
+              />
+            </>
+          )}
+
+          {(loading || loadingResults) && (
+            <div className="text-gray-700">Processing...</div>
+          )}
+
+          {imageSrc && !loading && (
+            <div className="flex flex-col items-center space-y-4">
+              <img
+                src={imageSrc}
+                alt="Uploaded"
+                className="max-w-full h-auto rounded shadow"
+              />
+              {problems.length > 0 && (
+                <div className="w-full max-w-md">
+                  <h2 className="text-xl font-semibold mb-2">Detected Problems:</h2>
+                  <ul className="space-y-2">
+                    {problems.map((problem, index) => (
+                      <li key={index} className="p-4 bg-white rounded shadow">
+                        <h1 className="font-bold">SC API ID: {problem.sc_api_id}</h1>
+                        <h3 className="font-bold">{problem.title}</h3>
+                        <p><strong>Price Estimate:</strong> {problem.estimated_price}</p>
+                        <p><strong>Category:</strong> {problem.category}</p>
+                        {problem.subcategory && (
+                          <p><strong>Subcategory:</strong> {problem.subcategory}</p>
+                        )}
+                        <p>{problem.problem_description}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <button
+                onClick={handleReset}
+                className="px-4 py-2 bg-gray-500 text-white rounded shadow"
+              >
+                Upload Another
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // Create a root and render the App component
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
