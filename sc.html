@@ -246,6 +246,7 @@
       return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 space-y-6 p-4">
           <h1 className="text-3xl md:text-4xl font-bold">Snap to Quote</h1>
+          <img src="https://finderly.store/banner.jpeg" alt="Banner" className="w-full max-w-md rounded-md" />
           {error && (
             <div className="text-red-500">
               {error}
@@ -253,17 +254,17 @@
           )}
 
           {!imageSrc && !loading && !showCameraPreview && (
-            <>
+            <div className="flex flex-col items-center space-y-4 mt-6">
               <button
                 onClick={handleTakeLivePhoto}
-                className="text-xl md:text-2xl px-4 py-2 bg-blue-500 text-white rounded shadow"
+                className="w-64 text-xl md:text-2xl px-6 py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg"
               >
                 Take a Live Photo
               </button>
 
               <label
                 htmlFor="fileInput"
-                className="text-xl md:text-2xl px-4 py-2 bg-green-500 text-white rounded shadow cursor-pointer"
+                className="w-64 text-xl md:text-2xl px-6 py-4 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg text-center cursor-pointer"
               >
                 Choose from Gallery
               </label>
@@ -274,7 +275,7 @@
                 onChange={handleSelectPhoto}
                 className="hidden"
               />
-            </>
+            </div>
           )}
 
           {showCameraPreview && (
