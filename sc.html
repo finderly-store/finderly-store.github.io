@@ -191,7 +191,7 @@
           if (image_uuid) {
             bodyData.image_uuid = image_uuid;
           } else if (imageParam) {
-            bodyData.image = imageParam;
+            bodyData.image_uuid = imageParam;
           }
 
           const response = await fetchWithTimeout(
