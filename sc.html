@@ -53,8 +53,9 @@
         const imgParam = params.get('image');
         if (imgParam) {
           setImageParam(imgParam);
-          setImageSrc(imgParam);
-          // Since we have an image parameter, proceed to getDetailedResponse
+          const imageUrl = `https://pictureblobstorage.blob.core.windows.net/picture/${imgParam}`;
+          setImageSrc(imageUrl);
+
           getDetailedResponse(null, imgParam);
         }
       }, []);
@@ -166,10 +167,10 @@
           if (!data || !data.image_uuid) {
             throw new Error('Image upload response does not contain image_uuid');
           }
-
-          const imageUrl = `https://pictureblobstorage.blob.core.windows.net/picture/${data.image_uuid}`;
-          setImageSrc(imageUrl);
-
+          if (data.image_uuid.length !== 0) {
+            const imageUrl = `https://pictureblobstorage.blob.core.windows.net/picture/${data.image_uuid}`;
+            setImageSrc(imageUrl);
+          }
           // After uploading the image, get the detailed response
           getDetailedResponse(data.image_uuid);
         } catch (error) {
