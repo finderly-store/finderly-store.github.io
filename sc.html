@@ -39,7 +39,25 @@
       const [videoStream, setVideoStream] = React.useState(null);
       const [selectedProblemIndex, setSelectedProblemIndex] = React.useState(null);
       const [submitting, setSubmitting] = React.useState(false);
+      const [query, setQuery] = React.useState("home improvement services");
+      const [imageParam, setImageParam] = React.useState(null);
       const videoRef = React.useRef(null);
+
+      // Parse URL parameters
+      React.useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const qParam = params.get('query');
+        const queryParam = (qParam && qParam.trim()) ? qParam : "home improvement services";
+        setQuery(queryParam);
+
+        const imgParam = params.get('image');
+        if (imgParam) {
+          setImageParam(imgParam);
+          setImageSrc(imgParam);
+          // Since we have an image parameter, proceed to getDetailedResponse
+          getDetailedResponse(null, imgParam);
+        }
+      }, []);
 
       // Handle capturing live photo
       const handleTakeLivePhoto = () => {
@@ -163,14 +181,24 @@
       };
 
       // Get detailed response from SC-service
-      const getDetailedResponse = async (image_uuid) => {
+      const getDetailedResponse = async (image_uuid = null, imageParam = null) => {
         try {
           setLoadingResults(true);
+
+          // Prepare the request body
+          const bodyData = { query };
+
+          if (image_uuid) {
+            bodyData.image_uuid = image_uuid;
+          } else if (imageParam) {
+            bodyData.image = imageParam;
+          }
+
           const response = await fetchWithTimeout(
             'https://s.finderly.store/SC-service',
             {
               method: 'POST',
-              body: JSON.stringify({ image_uuid }),
+              body: JSON.stringify(bodyData),
               headers: {
                 'Content-Type': 'application/json',
               },
@@ -222,7 +250,7 @@
         try {
           setSubmitting(true);
           // Replace with actual endpoint URL
-          const response = await fetch('https://s.finderly.store/submit-problem', {
+          await fetch('https://s.finderly.store/submit-problem', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -243,6 +271,7 @@
         setError(null);
         setShowCameraPreview(false);
         setSelectedProblemIndex(null);
+        setImageParam(null);
       };
 
       return (
@@ -322,8 +351,8 @@
                       <div
                         key={index}
                         className="flex-shrink-0 w-[80vw] md:min-w-[250px] p-4 bg-white rounded shadow snap-center m-2"
-                        >
-                            <label className="cursor-pointer">
+                      >
+                        <label className="cursor-pointer">
                           <input
                             type="radio"
                             name="selectedProblem"
