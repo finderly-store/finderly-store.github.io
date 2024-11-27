@@ -7,25 +7,26 @@ info:
     name: Finderly Support
     email: support@finderly.com
 servers:
-  - url: https://finderly.store/
+  - url: https://s.finderly.store/
     description: Production Server
 
 paths:
   /sc-image-upload:
     post:
       summary: Upload an image
-      description: Uploads an image to Finderly. Returns a unique image UUID.
+      description: Uploads a JPG image under 2000 pixels on the longest side to Finderly. Returns a unique image UUID.
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
+              required:
+                - image
               properties:
                 image:
                   type: string
-                  format: binary
-                  description: Image file under 2000px on the longest side.
+                  description: Base64 encoded JPG image under 2000 pixels on the longest side.
       responses:
         '200':
           description: Image uploaded successfully
@@ -36,9 +37,9 @@ paths:
                 properties:
                   image_uuid:
                     type: string
-                    example: "123e4567-e89b-12d3-a456-426614174000"
+                    example: "123e4567-e89b-12d3-a456-426614174000.jpg"
         '400':
-          description: Invalid request
+          description: Invalid image data
           content:
             application/json:
               schema:
@@ -46,36 +47,40 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: "Image exceeds maximum dimensions."
-  /sc-image-lead:
+                    example: "Invalid image format or dimensions."
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Error uploading image."
+
+  /sc-lead:
     post:
       summary: Generate a lead from an image
-      description: Converts an uploaded image into a home services lead.
+      description: Converts an uploaded image into a home services lead. Optionally accepts a zip code and a user query to refine the output.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - image_uuid
               properties:
                 image_uuid:
                   type: string
                   description: Unique identifier for the uploaded image.
-                zip_code:
+                query:
                   type: string
-                  description: User's postal code.
-                contact_info:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      description: Full name of the user.
-                    email:
-                      type: string
-                      description: Email address of the user.
-                    phone:
-                      type: string
-                      description: Phone number of the user.
+                  description: Optional user query to refine the output.
+                zipcode:
+                  type: string
+                  description: Optional user's postal code.
       responses:
         '200':
           description: Lead generated successfully
@@ -84,17 +89,14 @@ paths:
               schema:
                 type: object
                 properties:
-                  lead_id:
+                  body:
                     type: string
-                    example: "789fghi4-jkl5-6789-mnop-987654321zyx"
-                  category:
+                    description: Assistant's response based on the image and provided details.
+                  thread:
                     type: string
-                    example: "Roof Repair"
-                  description:
-                    type: string
-                    example: "The image analysis identified damage to a roof. Recommended services include roof repair and inspection."
+                    description: Identifier for the conversation thread.
         '400':
-          description: Invalid request
+          description: Bad request
           content:
             application/json:
               schema:
@@ -102,9 +104,9 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: "Invalid image_uuid."
-        '404':
-          description: Image UUID not found
+                    example: "image_uuid is required."
+        '500':
+          description: Server error
           content:
             application/json:
               schema:
@@ -112,4 +114,4 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: "Image UUID not found."
+                    example: "Failed to process the request."
