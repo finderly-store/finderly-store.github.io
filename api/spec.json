@@ -78,11 +78,11 @@ paths:
                 image_uuid:
                   type: string
                   description: Unique identifier for the uploaded image.
-                  example: "123e4567-e89b-12d3-a456-426614174000.jpg"
+                  example: "301cdd8d-88b3-4e67-a6a2-d13d22a9bb00.jpg"
                 query:
                   type: string
                   description: Optional user query to refine the output.
-                  example: "Looking to remodel my kitchen."
+                  example: "Looking to remodel."
                 zipcode:
                   type: string
                   description: Optional user's postal code.
