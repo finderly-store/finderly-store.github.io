@@ -1,0 +1,115 @@
+openapi: 3.0.0
+info:
+  title: Finderly API
+  description: API for uploading images and generating home services leads.
+  version: 1.0.0
+  contact:
+    name: Finderly Support
+    email: support@finderly.com
+servers:
+  - url: https://finderly.store/
+    description: Production Server
+
+paths:
+  /sc-image-upload:
+    post:
+      summary: Upload an image
+      description: Uploads an image to Finderly. Returns a unique image UUID.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file under 2000px on the longest side.
+      responses:
+        '200':
+          description: Image uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  image_uuid:
+                    type: string
+                    example: "123e4567-e89b-12d3-a456-426614174000"
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Image exceeds maximum dimensions."
+  /sc-image-lead:
+    post:
+      summary: Generate a lead from an image
+      description: Converts an uploaded image into a home services lead.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image_uuid:
+                  type: string
+                  description: Unique identifier for the uploaded image.
+                zip_code:
+                  type: string
+                  description: User's postal code.
+                contact_info:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Full name of the user.
+                    email:
+                      type: string
+                      description: Email address of the user.
+                    phone:
+                      type: string
+                      description: Phone number of the user.
+      responses:
+        '200':
+          description: Lead generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lead_id:
+                    type: string
+                    example: "789fghi4-jkl5-6789-mnop-987654321zyx"
+                  category:
+                    type: string
+                    example: "Roof Repair"
+                  description:
+                    type: string
+                    example: "The image analysis identified damage to a roof. Recommended services include roof repair and inspection."
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid image_uuid."
+        '404':
+          description: Image UUID not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Image UUID not found."
