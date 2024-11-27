@@ -5,7 +5,7 @@ info:
   version: 1.0.0
   contact:
     name: Finderly Support
-    email: support@finderly.com
+    email: support@finderly.us
 servers:
   - url: https://s.finderly.store/
     description: Production Server
@@ -26,7 +26,10 @@ paths:
               properties:
                 image:
                   type: string
-                  description: Base64 encoded JPG image under 2000 pixels on the longest side.
+                  description: |
+                    Base64-encoded JPG image under 2000 pixels on the longest side.
+                    This should be the Base64 string **without** the `data:image/jpeg;base64,` prefix.
+                  example: "/9j/4AAQSkZJRgABAQAAAQABAAD..."  # Truncated Base64 string
       responses:
         '200':
           description: Image uploaded successfully
@@ -75,12 +78,15 @@ paths:
                 image_uuid:
                   type: string
                   description: Unique identifier for the uploaded image.
+                  example: "123e4567-e89b-12d3-a456-426614174000.jpg"
                 query:
                   type: string
                   description: Optional user query to refine the output.
+                  example: "Looking to remodel my kitchen."
                 zipcode:
                   type: string
                   description: Optional user's postal code.
+                  example: "90210"
       responses:
         '200':
           description: Lead generated successfully
