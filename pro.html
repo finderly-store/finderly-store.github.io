@@ -27,13 +27,13 @@
       height: auto;
     }
     .navbar-light .navbar-nav .nav-link {
-      color: #fff;
+      color: #000000;
     }
     .navbar-light .navbar-brand {
       color: #6c757d;
     }
     .navbar {
-      background-color: #f8f9fa;
+      background-color: #ffffff;
     }
     .footer {
       background-color: #f8f9fa;
@@ -42,6 +42,45 @@
     .footer p, .footer a {
       color: #6c757d;
       margin: 0;
+    }
+    /* Banner styles */
+    .banner {
+      background-image: url('https://finderly.store/home.jpg');
+      background-size: cover;
+      background-position: center;
+      height: 300px;
+      position: relative;
+    }
+    .banner-content {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      color: #c59844;
+    }
+    .btn-secondary {
+        margin-right: 10px;
+    }
+    .btn-info {
+        margin-bottom: 10px;
+    }
+    /* Camera preview styles */
+    .camera-preview {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      margin: auto;
+    }
+    .camera-preview video, .camera-preview canvas {
+      width: 100%;
+      height: auto;
+    }
+    .options-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    ul {
+      list-style-type: disc;
+      padding-left: 20px;
     }
   </style>
 
@@ -57,7 +96,7 @@
 <!-- Header Section -->
 <header class="header">
   <nav class="navbar navbar-expand-lg navbar-light">
-    <a class="navbar-brand" href="#">Your Company Logo</a>
+    <a class="navbar-brand" href="#"><img src="https://finderly.store/logo.png" alt="Company Logo" height="50"></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon" style="color: #fff;"></span>
     </button>
@@ -71,10 +110,54 @@
   </nav>
 </header>
 
+<!-- Banner Section -->
+<div class="banner">
+  <!-- Optional banner content -->
+  <div class="banner-content">
+    <h1>Residential and Commercial Services</h1>
+  </div>
+</div>
+
 <!-- Main Content Container -->
 <div class="container mt-5">
   <!-- React root element -->
   <div id="root"></div>
+</div>
+
+<!-- Additional Content Above Footer -->
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-6">
+      <h2>Connecting You with Trusted Home Improvement Professionals</h2>
+
+      <p>At Blitz Handyman Team, we quickly connect you with skilled home improvement experts who provide the services you need. Simply tell us a bit about your project, and we'll match you with professionals in your area.</p>
+
+      <h3>Our Services Include:</h3>
+
+      <ul>
+        <li>General Repairs</li>
+        <li>Carpentry Services</li>
+        <li>Plumbing Services</li>
+        <li>Electrical Services</li>
+        <li>Painting and Decorating</li>
+        <li>Flooring Installation</li>
+        <li>Tile Installation and Repair</li>
+        <li>Drywall Repair and Installation</li>
+        <li>Furniture Assembly</li>
+        <li>Landscaping and Yard Work</li>
+        <li>Gutter Cleaning and Maintenance</li>
+        <li>Pressure Washing</li>
+        <li>Home Maintenance Packages</li>
+        <li>Home Renovation Assistance</li>
+        <li>Appliance Installation and Setup</li>
+      </ul>
+
+      <p>Contact us today to get started on your next home project!</p>
+    </div>
+    <div class="col-md-6">
+      <img src="https://finderly.store/home.jpg" alt="Image" class="img-fluid">
+    </div>
+  </div>
 </div>
 
 <!-- Footer Section -->
@@ -99,7 +182,17 @@
 
 <!-- React code -->
 <script type="text/babel">
-  const { useState, useEffect } = React;
+  const { useState, useEffect, useRef } = React;
+
+  // Custom fetchWithTimeout function
+  const fetchWithTimeout = (url, options, timeout = 20000) => {
+    return Promise.race([
+      fetch(url, options),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout')), timeout)
+      ),
+    ]);
+  };
 
   function App() {
     const [step, setStep] = useState(1);
@@ -115,6 +208,26 @@
     const [errors, setErrors] = useState({});
     const [imagePreview, setImagePreview] = useState(null);
     const [addressAutoFilled, setAddressAutoFilled] = useState(false);
+
+    // State variables for camera preview and options
+    const [showCameraPreview, setShowCameraPreview] = useState(false);
+    const [videoStream, setVideoStream] = useState(null);
+    const [imageSrc, setImageSrc] = useState(null);
+    const [options, setOptions] = useState([]);
+    const [loadingOptions, setLoadingOptions] = useState(false);
+    const [error, setError] = useState(null);
+    const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
+
+    const videoRef = useRef(null);
+
+    useEffect(() => {
+      // Cleanup video stream on unmount
+      return () => {
+        if (videoStream) {
+          videoStream.getTracks().forEach(track => track.stop());
+        }
+      };
+    }, [videoStream]);
 
     const handleInputChange = (e) => {
       const { name, value, type, checked } = e.target;
@@ -151,7 +264,7 @@
         if (!formData.address) newErrors.address = 'Address is required';
       }
       if (currentStep === 4) {
-        if (!formData.photo) newErrors.photo = 'Photo is required';
+        if (!formData.photo && !imageSrc) newErrors.photo = 'Photo is required';
       }
       if (currentStep === 5) {
         if (!formData.phone) newErrors.phone = 'Phone number is required';
@@ -191,7 +304,115 @@
           ...formData,
           photo: file
         });
-        setImagePreview(URL.createObjectURL(file));
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const dataUrl = reader.result;
+          setImagePreview(dataUrl);
+          uploadImage(dataUrl);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    const handleTakeLivePhoto = () => {
+      setShowCameraPreview(true);
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+          .then(stream => {
+            setVideoStream(stream);
+            if (videoRef.current) {
+              videoRef.current.srcObject = stream;
+            }
+          })
+          .catch(error => {
+            console.error('Error accessing camera:', error);
+            alert('Unable to access camera.');
+            setShowCameraPreview(false);
+          });
+      } else {
+        alert('Camera not supported on this device.');
+      }
+    };
+
+    const handleCapturePhoto = () => {
+      if (videoRef.current) {
+        const video = videoRef.current;
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        setImageSrc(dataUrl);
+        setImagePreview(dataUrl);
+        setShowCameraPreview(false);
+        // Stop video stream
+        if (videoStream) {
+          videoStream.getTracks().forEach(track => track.stop());
+          setVideoStream(null);
+        }
+        // Upload the image and get options
+        uploadImage(dataUrl);
+      }
+    };
+
+    const uploadImage = async (dataUrl) => {
+      try {
+        setLoadingOptions(true);
+        setError(null);
+
+        // Send image to SC-image endpoint
+        const response = await fetchWithTimeout('https://s.finderly.store/SC-image/', {
+          method: 'POST',
+          body: JSON.stringify({ image: dataUrl }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }, 20000);
+
+        const text = await response.text();
+        const data = JSON.parse(text);
+
+        if (!data || !data.image_uuid) {
+          throw new Error('Image upload response does not contain image_uuid');
+        }
+
+        const image_uuid = data.image_uuid;
+
+        // Now send image_uuid to SC-service endpoint
+        const scResponse = await fetchWithTimeout('https://s.finderly.store/SC-service', {
+          method: 'POST',
+          body: JSON.stringify({ image_uuid: image_uuid, query: 'home improvement services' }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }, 20000);
+
+        if (!scResponse.ok) {
+          throw new Error(`Server responded with status ${scResponse.status}`);
+        }
+
+        const scData = await scResponse.json();
+
+        let parsedData;
+
+        if (scData.body) {
+          parsedData = JSON.parse(scData.body);
+        } else {
+          parsedData = scData;
+        }
+
+        if (!parsedData || !Array.isArray(parsedData.problems)) {
+          throw new Error('Response does not contain a valid problems array');
+        }
+
+        setOptions(parsedData.problems);
+
+      } catch (error) {
+        console.error('Error processing image:', error);
+        setError('An error occurred while processing the image.');
+      } finally {
+        setLoadingOptions(false);
       }
     };
 
@@ -278,7 +499,7 @@
                   {errors.address && <div className="invalid-feedback">{errors.address}</div>}
                 </div>
                 <div className="mt-3">
-                    <button type="button" className="btn btn-secondary" onClick={handleBack}>Back</button>
+                  <button type="button" className="btn btn-secondary" onClick={handleBack}>Back</button>
                   <button type="button" className="btn btn-primary mr-2" onClick={handleNext}>Next</button>
                 </div>
               </div>
@@ -286,25 +507,90 @@
             {step === 4 && (
               <div className="form-step active">
                 <h3>Step 4: Upload a Photo of the Place</h3>
-                <div className="form-group">
-                  <label>Photo *</label>
-                  <input
-                    type="file"
-                    className={`form-control-file ${errors.photo ? 'is-invalid' : ''}`}
-                    name="photo"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                  />
-                  {errors.photo && <div className="invalid-feedback">{errors.photo}</div>}
-                </div>
+                {!showCameraPreview && !imagePreview && (
+                  <div className="form-group">
+                    <button type="button" className="btn btn-info mr-2" onClick={handleTakeLivePhoto}>
+                      Take a Live Photo
+                    </button>
+                    <input
+                      type="file"
+                      className={`form-control-file ${errors.photo ? 'is-invalid' : ''}`}
+                      name="photo"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                    />
+                    {errors.photo && <div className="invalid-feedback">{errors.photo}</div>}
+                  </div>
+                )}
+                {showCameraPreview && (
+                  <div className="camera-preview">
+                    <video ref={videoRef} autoPlay playsInline></video>
+                    <button type="button" className="btn btn-primary mt-2" onClick={handleCapturePhoto}>
+                      Capture Photo
+                    </button>
+                    <button type="button" className="btn btn-secondary mt-2" onClick={() => setShowCameraPreview(false)}>
+                      Cancel
+                    </button>
+                  </div>
+                )}
                 {imagePreview && (
                   <div className="mt-3">
                     <img src={imagePreview} alt="Preview" className="preview-img" />
                   </div>
                 )}
+                {loadingOptions && (
+                  <div className="mt-3">
+                    <p>Processing image and fetching options...</p>
+                  </div>
+                )}
+                {error && (
+                  <div className="mt-3 text-danger">
+                    {error}
+                  </div>
+                )}
+                {options.length > 0 && (
+                  <div className="mt-3">
+                    <h4>Select a Problem:</h4>
+                    <div className="options-list">
+                      {options.map((problem, index) => (
+                        <div key={index} className="form-check">
+                          <input
+                            type="radio"
+                            className="form-check-input"
+                            name="selectedOption"
+                            value={index}
+                            checked={selectedOptionIndex === index}
+                            onChange={() => setSelectedOptionIndex(index)}
+                          />
+                          <label className="form-check-label">
+                            <strong>{problem.title}</strong><br />
+                            <em>Estimated Price:</em> {problem.estimated_price}<br />
+                            <em>Category:</em> {problem.category}<br />
+                            {problem.subcategory && <><em>Subcategory:</em> {problem.subcategory}<br /></>}
+                            <em>Description:</em> {problem.problem_description}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="mt-3">
-                    <button type="button" className="btn btn-secondary" onClick={handleBack}>Back</button>
-                  <button type="button" className="btn btn-primary mr-2" onClick={handleNext}>Next</button>
+                  <button type="button" className="btn btn-secondary" onClick={handleBack}>Back</button>
+                  <button
+                    type="button"
+                    className="btn btn-primary mr-2"
+                    onClick={handleNext}
+                    disabled={loadingOptions}
+                  >
+                    {loadingOptions ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Loading...
+                      </>
+                    ) : (
+                      'Next'
+                    )}
+                  </button>
                 </div>
               </div>
             )}
