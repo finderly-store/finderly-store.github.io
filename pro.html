@@ -48,14 +48,13 @@
       background-image: url('https://finderly.store/home.jpg');
       background-size: cover;
       background-position: center;
-      height: 300px;
       position: relative;
+      padding-top: 50px;
+      padding-bottom: 50px;
     }
     .banner-content {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      color: #c59844;
+      text-align: center;
+      color: #ffffff;
     }
     .btn-secondary {
         margin-right: 10px;
@@ -81,6 +80,11 @@
     ul {
       list-style-type: disc;
       padding-left: 20px;
+    }
+    /* Form card styling */
+    .form-card {
+      max-width: 600px;
+      margin: auto;
     }
   </style>
 
@@ -112,16 +116,15 @@
 
 <!-- Banner Section -->
 <div class="banner">
-  <!-- Optional banner content -->
+  <!-- Banner content -->
   <div class="banner-content">
     <h1>Residential and Commercial Services</h1>
   </div>
-</div>
-
-<!-- Main Content Container -->
-<div class="container mt-5">
-  <!-- React root element -->
-  <div id="root"></div>
+  <!-- Main Content Container -->
+  <div class="container mt-5">
+    <!-- React root element -->
+    <div id="root"></div>
+  </div>
 </div>
 
 <!-- Additional Content Above Footer -->
@@ -429,33 +432,35 @@
     };
 
     return (
-      <div className="card">
+      <div className="card form-card">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
             {step === 1 && (
               <div className="form-step active">
                 <h3>Step 1: Enter Your Name</h3>
-                <div className="form-group">
-                  <label>First Name *</label>
-                  <input
-                    type="text"
-                    className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                  />
-                  {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
-                </div>
-                <div className="form-group">
-                  <label>Last Name *</label>
-                  <input
-                    type="text"
-                    className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                  />
-                  {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
+                <div className="form-row">
+                  <div className="form-group col-md-6">
+                    <label>First Name *</label>
+                    <input
+                      type="text"
+                      className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                    />
+                    {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
+                  </div>
+                  <div className="form-group col-md-6">
+                    <label>Last Name *</label>
+                    <input
+                      type="text"
+                      className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                    />
+                    {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
+                  </div>
                 </div>
                 <button type="button" className="btn btn-primary" onClick={handleNext}>Next</button>
               </div>
